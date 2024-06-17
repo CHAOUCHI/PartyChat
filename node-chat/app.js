@@ -8,15 +8,15 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:4200"
+        origin: "http://localhost:4200"
     }
-  });
+});
 
 
 app.use(cors({
-  origin: 'http://localhost:4200',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
+    origin: 'http://localhost:4200',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
 }));
 
 app.get('/', (req, res) => {
@@ -31,12 +31,17 @@ app.get('/room2', (req, res) => {
     res.sendFile(path.join(__dirname, 'room2.html'));
 });
 
+const connectedSockets = {};
+
 io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on('getName', (name) => {
-        socket.name = name;  
+        socket.name = name;
+        connectedSockets[socket.id] = name;
         console.log(`Socket with ID ${socket.id} is named ${socket.name}`);
+        io.emit('connectedUsers', Object.values(connectedSockets));
+        console.log(connectedSockets);
     });
 
     socket.on('join room', (room) => {
@@ -54,6 +59,9 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`${socket.name || 'A user'} disconnected`);
+        delete connectedSockets[socket.id];
+        io.emit('connectedUsers', Object.values(connectedSockets));
+        console.log(connectedSockets);
     });
 });
 

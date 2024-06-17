@@ -1,1 +1,20 @@
-<p>room1 works!</p>
+<h1>Room 1</h1>
+
+@if (name === '') {
+    <form (submit)="setName($event)">
+        <input type="text" name="nameInput" id="nameInput" [formControl]="nameInput">
+        <button type="submit" [disabled]="!nameInput.valid">Go!</button>
+    </form> 
+}
+
+@if (name != '') {
+    <ul id="messages">
+        @for (msg of messages; track msg) {
+            <li><strong> {{ msg.name }} </strong> {{ msg.msg }} </li>
+        }
+    </ul>
+    <form (submit)="sendMessage($event)" id="form">
+        <input type="text" name="messageInput" id="input" [formControl]="messageInput">
+        <button type="submit" [disabled]="!messageInput.valid">Send message!</button>
+    </form> 
+}
