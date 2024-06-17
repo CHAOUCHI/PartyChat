@@ -8,6 +8,8 @@
 }
 
 @if (name != '') {
+    <h2>Chat</h2>
+    
     <ul id="messages">
         @for (msg of messages; track msg) {
             <li><strong> {{ msg.name }} </strong> {{ msg.msg }} </li>

@@ -14,11 +14,16 @@ export class Room1Component implements OnInit {
   message: string = '';
   room: string = '1';
   name: string = '';
+  connectedUsers: string[] = [];
 
   constructor(private socketIoService: SocketIoService) { 
     this.socketIoService.onMessage((message: { name: string, msg: string }) => {
       this.messages.push(message);
     });
+
+    // this.socketIoService.onConnectedSockets((names: string[]) => {
+    //   this.connectedUsers = names; 
+    // }); 
   }
 
   nameInput = new FormControl<string>("",[
