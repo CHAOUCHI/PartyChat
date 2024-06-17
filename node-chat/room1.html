@@ -77,6 +77,7 @@
         var socket = io();
         var room = 'room1';
 
+
         socket.emit('join room', room);
 
         document.getElementById('nameForm').addEventListener('submit', function (e) {

@@ -1,14 +1,23 @@
 const express = require('express');
 const http = require('http');
-const cors = require('cors')
+const cors = require('cors');
 const { Server } = require('socket.io');
 const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:4200"
+    }
+  });
 
-app.use(cors([]))
+
+app.use(cors({
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -25,7 +34,6 @@ app.get('/room2', (req, res) => {
 io.on('connection', (socket) => {
     console.log('a user connected');
 
-    
     socket.on('getName', (name) => {
         socket.name = name;  
         console.log(`Socket with ID ${socket.id} is named ${socket.name}`);
@@ -34,6 +42,10 @@ io.on('connection', (socket) => {
     socket.on('join room', (room) => {
         socket.join(room);
         console.log(`${socket.name || 'A user'} joined room ${room}`);
+    });
+
+    socket.on('angular', (data) => {
+        console.log(data);
     });
 
     socket.on('chat message', (data) => {
