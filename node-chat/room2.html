@@ -71,6 +71,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        const room = 'room2'
+
+        socket.emit('join room', room);
 
         const form = document.getElementById('form');
         const input = document.getElementById('input');
@@ -79,7 +82,7 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (input.value) {
-                socket.emit('chat message', input.value);
+                socket.emit('chat message', { room: room, msg: input.value });
                 input.value = '';
             }
         });
