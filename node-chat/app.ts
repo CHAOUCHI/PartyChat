@@ -12,7 +12,6 @@ const io = new Server(server, {
     }
 });
 
-
 app.use(cors({
     origin: 'http://localhost:4200',
     methods: ['GET', 'POST'],
@@ -31,18 +30,14 @@ app.get('/room2', (req, res) => {
     res.sendFile(path.join(__dirname, 'room2.html'));
 });
 
-const connectedSockets = {}
+const connectedSockets = {};
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    // connectedSockets.push({
-    //     id: ,
-    //     name : 
-    // })
-    socket.on('getName', (name) => {
 
+    socket.on('getName', (name) => {
         socket.name = name;
-        connectedSockets[socket.id] = name;
+        connectedSockets[socket.id] = { id: socket.id, name: name };
         console.log(`Socket with ID ${socket.id} is named ${socket.name}`);
         io.emit('connectedUsers', Object.values(connectedSockets));
         console.log(connectedSockets);

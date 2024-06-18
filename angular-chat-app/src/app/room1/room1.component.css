@@ -52,3 +52,33 @@ body {
 #messages>li:nth-child(odd) {
     background: #efefef;
 }
+
+#inputChatContainer {
+    position: fixed;
+    bottom: 3rem; /* height of the form */
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#inputChat {
+    position: relative;
+}
+
+#usersContainer {
+    position: absolute;
+    bottom: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+#user{
+    margin-left: 1%;
+}
+
+#user:hover{
+    cursor: pointer;
+}

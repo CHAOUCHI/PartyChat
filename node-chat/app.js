@@ -27,13 +27,9 @@ app.get('/room2', function (req, res) {
 var connectedSockets = {};
 io.on('connection', function (socket) {
     console.log('a user connected');
-    // connectedSockets.push({
-    //     id: ,
-    //     name : 
-    // })
     socket.on('getName', function (name) {
         socket.name = name;
-        connectedSockets[socket.id] = name;
+        connectedSockets[socket.id] = { id: socket.id, name: name };
         console.log("Socket with ID ".concat(socket.id, " is named ").concat(socket.name));
         io.emit('connectedUsers', Object.values(connectedSockets));
         console.log(connectedSockets);

@@ -25,9 +25,9 @@ export class SocketIoService {
     this.socket.on('chat message', callback);
   }
 
-  // onConnectedSockets(callback: (names: string[]) => void): void {
-  //   this.socket.on('connectedUsers', callback);
-  // }
+  onConnectedSockets(callback: (names: { id: string, name: string}[]) => void): void {
+    this.socket.on('connectedUsers', callback);
+  }
 
   disconnect(): void {
     this.socket.disconnect();
