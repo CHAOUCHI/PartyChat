@@ -38,7 +38,9 @@ export class Room1Component implements OnInit {
       const sentByUser = message.idSender === this.socketIoService.socketId;
       const pingedUser = message.IDs.includes(this.socketIoService.socketId)
       this.messages.push({ ...message, sentByUser, pingedUser });
-      console.log(this.messages)
+      if (pingedUser) {
+        this.showNotification(message.name, message.msg);
+      }
     });
 
     this.socketIoService.onConnectedSockets((sockets: { id: string, name: string }[]) => {
@@ -54,6 +56,17 @@ export class Room1Component implements OnInit {
     this.socketIoService.joinRoom(this.room, (response) => {
       // console.log(response);
     });
+
+
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+        } else {
+          console.log('Notification permission denied.');
+        }
+      });
+    }
   }
 
   updateNameInputValidators() {
@@ -129,5 +142,15 @@ export class Room1Component implements OnInit {
     }
 
     return mentionedUserIds;
+  }
+
+  private showNotification(title: string, body: string) {
+    if (Notification.permission === 'granted') {
+      const options = {
+        body: body,
+        icon: 'path/to/icon.png' // You can specify an icon for the notification
+      };
+      const notification = new Notification(title, options);
+    }
   }
 }
