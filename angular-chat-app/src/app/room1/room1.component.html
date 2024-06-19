@@ -1,34 +1,40 @@
 <h1>Room 1</h1>
 
 @if (name === '') {
-    <form (submit)="setName($event)">
-        <input type="text" name="nameInput" id="nameInput" [formControl]="nameInput">
-        <button type="submit" [disabled]="!nameInput.valid">Go!</button>
-    </form>
+<form (submit)="setName($event)">
+    <input type="text" name="nameInput" id="nameInput" [formControl]="nameInput">
+    <button type="submit" [disabled]="!nameInput.valid">Go!</button>
+</form>
 }
 
 @if (name != '') {
-    <h2>Chat</h2>
+<h2>Chat</h2>
 
-    <ul id="messages">
+<div id="messages">
     @for (msg of messages; track msg) {
-        <li><strong> {{ msg.name }} </strong> {{ msg.msg }} </li>
-    }
-    </ul>
 
-    <div id="inputChatContainer">
-        <div id="inputChat"> 
-            @if (showUsers) {
-                <div id="usersContainer">
-                    @for (user of connectedUsers; track user) {
-                    <p id="user" (click)="callUser($event)">{{user.name}}</p>
-                    }
-                </div>
-            }
-            <form (submit)="sendMessage($event)" id="form" >
-                <input type="text" name="messageInput" id="input" [formControl]="messageInput" (input)="onInputChange($event)" #messageInputField>
-                <button type="submit" [disabled]="!messageInput.valid">Send message!</button>
-            </form>
-        </div>
+    <div class="message-container" [ngClass]="{'right': msg.sentByUser,'left': !msg.sentByUser,'pinged': msg.pingedUser}">
+        <h4 class="h4Messages"><strong>{{ msg.name }}</strong></h4>
+        <p class="message">{{ msg.msg }}</p>
     </div>
+
+    }
+</div>
+
+<div id="inputChatContainer">
+    <div id="inputChat">
+        @if (showUsers) {
+        <div id="usersContainer">
+            @for (user of connectedUsers; track user) {
+            <p id="user" (click)="callUser($event)">{{user.name}}</p>
+            }
+        </div>
+        }
+        <form (submit)="sendMessage($event)" id="form">
+            <input type="text" name="messageInput" id="input" [formControl]="messageInput"
+                (input)="onInputChange($event)" #messageInputField>
+            <button type="submit" [disabled]="!messageInput.valid">Send message!</button>
+        </form>
+    </div>
+</div>
 }

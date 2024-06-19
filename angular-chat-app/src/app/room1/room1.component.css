@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding-bottom: 3rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: Arial;
 }
 
 #form {
@@ -39,23 +39,15 @@ body {
     color: #fff;
 }
 
-#messages {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
 
-#messages>li {
-    padding: 0.5rem 1rem;
-}
 
-#messages>li:nth-child(odd) {
-    background: #efefef;
-}
+/* #messages>li:nth-child(odd) {
+    /* background: #efefef; 
+} */
 
 #inputChatContainer {
     position: fixed;
-    bottom: 3rem; /* height of the form */
+    bottom: 3rem;
     left: 0;
     right: 0;
     display: flex;
@@ -82,3 +74,44 @@ body {
 #user:hover{
     cursor: pointer;
 }
+
+#messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adjust as needed for spacing between messages */
+    padding: 20px; /* Example padding for the messages container */
+}
+
+.message-container {
+    max-width: 70%; /* Limit the maximum width of the message container */
+    padding: 8px; /* Adjust padding for smaller message containers */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word; /* Ensures long words break to fit within container */
+}
+
+.right {
+    align-self: flex-end; /* Aligns the container to the right within #messages */
+    text-align: right; /* Align text to the right within the container */
+}
+
+.pinged {
+    background-color: rgb(95, 82, 209);
+    color: white;
+}
+
+.left {
+    align-self: flex-start; /* Aligns the container to the left within #messages */
+    text-align: left; /* Align text to the left within the container */
+}
+
+.h4Messages{
+    margin-block-start: 0.2em;
+    
+}
+
+.message {
+    margin-block-end: 0;
+}
+

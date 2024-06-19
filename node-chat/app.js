@@ -27,6 +27,7 @@ app.get('/room2', function (req, res) {
 var connectedSockets = {};
 io.on('connection', function (socket) {
     console.log('a user connected');
+    socket.emit('your id', socket.id);
     socket.on('getName', function (name) {
         socket.name = name;
         connectedSockets[socket.id] = { id: socket.id, name: name };
@@ -42,13 +43,14 @@ io.on('connection', function (socket) {
         console.log(data);
     });
     socket.on('chat message', function (data) {
-        io.to(data.room).emit('chat message', { name: socket.name, msg: data.msg });
+        console.log(data);
+        io.to(data.room).emit('chat message', { name: socket.name, msg: data.msg, idSender: data.idSender, IDs: data.IDs });
     });
     socket.on('disconnect', function () {
-        console.log("".concat(socket.name || 'A user', " disconnected"));
+        // console.log(`${socket.name || 'A user'} disconnected`);
         delete connectedSockets[socket.id];
         io.emit('connectedUsers', Object.values(connectedSockets));
-        console.log(connectedSockets);
+        // console.log(connectedSockets);
     });
 });
 server.listen(3000, function () {
