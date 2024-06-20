@@ -3,6 +3,10 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const path = require('path');
+const jwt = require("jsonwebtoken");
+const secret = "secret-for-jwt"
+const cookieParser = require("cookie-parser");
+
 
 const app = express();
 const server = http.createServer(app);
@@ -12,23 +16,54 @@ const io = new Server(server, {
     }
 });
 
+app.use(cookieParser());
+
 app.use(cors({
     origin: 'http://localhost:4200',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+/*  JWT  */                     
 
-app.get('/room1', (req, res) => {
-    res.sendFile(path.join(__dirname, 'room1.html'));
-});
+app.post("/login", (req,res)=>{
+    const payload = { name: "esteban", role: "admin"};
+    const newToken = jwt.sign(payload,secret)
 
-app.get('/room2', (req, res) => {
-    res.sendFile(path.join(__dirname, 'room2.html'));
-});
+    res.cookie("token",newToken,{httpOnly:true});
+
+    return res.json({msg : '☺'})
+})
+
+app.post("/product",checkJwt,(req,res)=>{
+    // ...
+    res.status(200).json({content: 'some content'});
+ })
+
+function checkJwt(req,res,next){
+    
+    const token = req.cookies.token; // Lire les cookies plutôt que le body.
+
+
+    jwt.verify(token,secret,(err,decodedToken)=>{
+        if(err){
+            res.status(401).json("Unauthorized, wrng token");
+            return;
+        }
+        switch (decodedToken.role){
+            case "admin":
+                next();
+                break;
+
+            case "guest":
+            default:
+                res.status(401).json({msg:"Unauthorized role"});
+                break;
+        }
+    })
+}
+
+/* SOCKET IO */
 
 const connectedSockets = {};
 
@@ -50,23 +85,30 @@ io.on('connection', (socket) => {
         console.log(`${socket.name || 'A user'} joined room ${room}`);
     });
 
+    socket.on('leave room', (room) => {
+        socket.leave(room)
+        console.log(`${socket.name || 'A user'} leaved room ${room}`)
+    })
+
     socket.on('angular', (data) => {
         console.log(data);
     });
 
     socket.on('chat message', (data) => {
         console.log(data);
-        io.to(data.room).emit('chat message', { name: socket.name, msg: data.msg, idSender: data.idSender,IDs: data.IDs });
+        io.to(data.room).emit('chat message', { room:data.room, name: socket.name, msg: data.msg, idSender: data.idSender,IDs: data.IDs });
     });
 
     socket.on('disconnect', () => {
-        // console.log(`${socket.name || 'A user'} disconnected`);
+        const disconnectedUserId = socket.id;
         delete connectedSockets[socket.id];
-        io.emit('connectedUsers', Object.values(connectedSockets));
-        // console.log(connectedSockets);
+        console.log(Object.values(connectedSockets)); // Log the remaining connected sockets
+        io.emit('userDisconnected', disconnectedUserId); // Emit the userId instead of the array
     });
+    
 });
 
 server.listen(3000, () => {
     console.log('server running at http://localhost:3000');
 });
+

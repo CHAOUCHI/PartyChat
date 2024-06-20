@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { io, Socket} from 'socket.io-client'
+import { io, Socket } from 'socket.io-client';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketIoService {
   private readonly URL: string = 'http://localhost:3000';
-  private socket: Socket  = io(this.URL);
-  public socketId: string = ''
+  private socket: Socket = io(this.URL);
+  public socketId: string = '';
 
   constructor() {
     this.socket.on('your id', (id: string) => {
@@ -28,16 +28,25 @@ export class SocketIoService {
     this.socket.emit('join room', room, callback);
   }
 
-  sendMessage(room: string, msg: string, idSender:string,IDs: string[]): void {
-    this.socket.emit('chat message', { room, msg, idSender,IDs });
+  leaveRoom(room: string, callback: (response: { status: string, message: string}) => void): void {
+    this.socket.emit('leave room', room, callback)
   }
 
-  onMessage(callback: (data: { name: string, msg: string, idSender:string, IDs: string[]}) => void): void {
+  sendMessage(room: string, msg: string, idSender: string, IDs: string[]): void {
+    this.socket.emit('chat message', { room, msg, idSender, IDs });
+  }
+
+  onMessage(callback: (data: { room: string, name: string, msg: string, idSender: string, IDs: string[] }) => void): void {
     this.socket.on('chat message', callback);
   }
 
-  onConnectedSockets(callback: (names: { id: string, name: string}[]) => void): void {
+  onConnectedSockets(callback: (names: { id: string, name: string }[]) => void): void {
     this.socket.on('connectedUsers', callback);
+  }
+
+  onUserDisconnected(callback: (userId: string) => void): void {
+    this.socket.on('userDisconnected', callback);
+    // console.log(callback)
   }
 
   disconnect(): void {
