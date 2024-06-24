@@ -1,14 +1,16 @@
-var express = require('express');
-var http = require('http');
-var cors = require('cors');
-var Server = require('socket.io').Server;
-var path = require('path');
-var jwt = require("jsonwebtoken");
-var secret = "secret-for-jwt";
-var cookieParser = require("cookie-parser");
-var app = express();
-var server = http.createServer(app);
-var io = new Server(server, {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express = require('express');
+const http = require('http');
+const cors = require('cors');
+const { Server } = require('socket.io');
+const path = require('path');
+const jwt = require("jsonwebtoken");
+const secret = "secret-for-jwt";
+const cookieParser = require("cookie-parser");
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
     cors: {
         origin: "http://localhost:4200"
     }
@@ -20,19 +22,19 @@ app.use(cors({
     allowedHeaders: ['Content-Type'],
 }));
 /*  JWT  */
-app.post("/login", function (req, res) {
-    var payload = { name: "esteban", role: "admin" };
-    var newToken = jwt.sign(payload, secret);
+app.post("/login", (req, res) => {
+    const payload = { name: "esteban", role: "admin" };
+    const newToken = jwt.sign(payload, secret);
     res.cookie("token", newToken, { httpOnly: true });
     return res.json({ msg: '☺' });
 });
-app.post("/product", checkJwt, function (req, res) {
+app.post("/product", checkJwt, (req, res) => {
     // ...
     res.status(200).json({ content: 'some content' });
 });
 function checkJwt(req, res, next) {
-    var token = req.cookies.token; // Lire les cookies plutôt que le body.
-    jwt.verify(token, secret, function (err, decodedToken) {
+    const token = req.cookies.token; // Lire les cookies plutôt que le body.
+    jwt.verify(token, secret, (err, decodedToken) => {
         if (err) {
             res.status(401).json("Unauthorized, wrng token");
             return;
@@ -49,39 +51,39 @@ function checkJwt(req, res, next) {
     });
 }
 /* SOCKET IO */
-var connectedSockets = {};
-io.on('connection', function (socket) {
+const connectedSockets = {};
+io.on('connection', (socket) => {
     console.log('a user connected');
     socket.emit('your id', socket.id);
-    socket.on('getName', function (name) {
+    socket.on('getName', (name) => {
         socket.name = name;
         connectedSockets[socket.id] = { id: socket.id, name: name };
-        console.log("Socket with ID ".concat(socket.id, " is named ").concat(socket.name));
+        console.log(`Socket with ID ${socket.id} is named ${socket.name}`);
         io.emit('connectedUsers', Object.values(connectedSockets));
         console.log(connectedSockets);
     });
-    socket.on('join room', function (room) {
+    socket.on('join room', (room) => {
         socket.join(room);
-        console.log("".concat(socket.name || 'A user', " joined room ").concat(room));
+        console.log(`${socket.name || 'A user'} joined room ${room}`);
     });
-    socket.on('leave room', function (room) {
+    socket.on('leave room', (room) => {
         socket.leave(room);
-        console.log("".concat(socket.name || 'A user', " leaved room ").concat(room));
+        console.log(`${socket.name || 'A user'} leaved room ${room}`);
     });
-    socket.on('angular', function (data) {
+    socket.on('angular', (data) => {
         console.log(data);
     });
-    socket.on('chat message', function (data) {
+    socket.on('chat message', (data) => {
         console.log(data);
         io.to(data.room).emit('chat message', { room: data.room, name: socket.name, msg: data.msg, idSender: data.idSender, IDs: data.IDs });
     });
-    socket.on('disconnect', function () {
-        var disconnectedUserId = socket.id;
+    socket.on('disconnect', () => {
+        const disconnectedUserId = socket.id;
         delete connectedSockets[socket.id];
         console.log(Object.values(connectedSockets)); // Log the remaining connected sockets
         io.emit('userDisconnected', disconnectedUserId); // Emit the userId instead of the array
     });
 });
-server.listen(3000, function () {
+server.listen(3000, () => {
     console.log('server running at http://localhost:3000');
 });

@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compiler": "tsc -w app.ts"
+    "build": "tsc",
+    "start": " node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,13 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.1",
     "socket.io": "^4.7.5",
-    "tsc": "^2.0.4",
-    "typescript": "^5.4.5"
+    "tsc": "^2.0.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
   }
 }
