@@ -37,12 +37,11 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-router.post('/product', checkJwt, (req: Request, res: Response) => {
-    // Your protected route logic here
+router.get('/product', checkJwt, (req: Request, res: Response) => {
     res.status(200).json({ content: 'some content' });
 });
 
-router.post('/users',checkJwt ,async (req: Request, res: Response) => {
+router.get('/users',checkJwt ,async (req: Request, res: Response) => {
     try {
         const users = await Users.findAll();
         res.json(users);
@@ -64,7 +63,7 @@ function checkJwt(req: Request, res: Response, next: Function) {
                 next();
                 break;
             default:
-                res.status(401).json({ msg: `your name ${decodedToken.name}` });
+                res.status(401).json({ msg: `not authorized user` });
                 break;
         }
     });

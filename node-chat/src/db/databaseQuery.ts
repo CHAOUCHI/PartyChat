@@ -19,7 +19,7 @@ sequelize.authenticate()
 .then(()=>console.log("connect ok"))
 .catch(error=>console.log(error));
 
-const Users = sequelize.define("user", {
+const Users = sequelize.define("users", {
     id: {
         type: DataType.INTEGER,
         primaryKey: true,
