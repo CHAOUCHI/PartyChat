@@ -16,14 +16,14 @@ const io = new Server(server, {
     },
 });
 
-// Middleware
 app.use(cors({
     origin: 'http://localhost:4200',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
+    credentials: true
 }));
 app.use(cookieParser());
-app.use(express.json()); // Middleware to parse JSON
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 test()

@@ -30,7 +30,7 @@ router.post('/login', async (req: Request, res: Response) => {
         const newToken = jwt.sign(payload, secret);
 
         res.cookie('token', newToken, { httpOnly: true });
-        return res.json({ msg: 'Login successful'});
+        return res.json({ msg: 'Login successful' , name:  user.dataValues.name});
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ msg: 'Server error' });
