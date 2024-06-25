@@ -3,6 +3,7 @@ import { SocketIoService } from '../socket.io.service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { isInArray } from '../../validators/isInArray';
 import { NgClass, NgStyle } from '@angular/common';
+import { CrudService } from '../crud.service';
 
 @Component({
   selector: 'app-room1',
@@ -32,7 +33,7 @@ export class Room1Component implements OnInit, OnChanges {
     Validators.maxLength(255)
   ]);
 
-  constructor(private socketIoService: SocketIoService) {}
+  constructor(private socketIoService: SocketIoService, private crud: CrudService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['room'] && !changes['room'].firstChange) {
@@ -44,11 +45,24 @@ export class Room1Component implements OnInit, OnChanges {
         console.log(`Joined room: ${this.room}`);
       });
       this.name = '';
+      if (this.crud.userName !== '') {
+      this.name = this.crud.userName
+      this.socketIoService.setName(this.name, (response) => {
+        console.log(`Name set to: ${this.name}`);
+      });
+    }
       this.messages = [];
     }
   }
 
   ngOnInit(): void {
+    if (this.crud.userName !== '') {
+      this.name = this.crud.userName
+      this.socketIoService.setName(this.name, (response) => {
+        console.log(`Name set to: ${this.name}`);
+      });
+    }
+    
     this.socketChanges();
 
     if (this.room) {
@@ -102,16 +116,16 @@ export class Room1Component implements OnInit, OnChanges {
     this.nameInput.updateValueAndValidity();
   }
 
-  setName(event: Event): void {
-    event.preventDefault();
+  // setName(event: Event): void {
+  //   event.preventDefault();
     
-    this.name = this.nameInput.value!;
-    this.socketIoService.setName(this.name, (response) => {
-      console.log(`Name set to: ${this.name}`);
-    });
+  //   this.name = this.nameInput.value!;
+  //   this.socketIoService.setName(this.name, (response) => {
+  //     console.log(`Name set to: ${this.name}`);
+  //   });
 
-    this.nameInput.reset();
-  }
+  //   this.nameInput.reset();
+  // }
 
   sendMessage(event: Event): void {
     event.preventDefault();
