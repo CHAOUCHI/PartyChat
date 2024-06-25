@@ -48,6 +48,7 @@ const Users = sequelize.define("user", {
     timestamps: false
 });
 
+
 // const connection = mysql.createConnection({
 //     host: 'localhost',
 //     user: 'root',
