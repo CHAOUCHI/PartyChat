@@ -30,19 +30,18 @@ router.post('/login', async (req: Request, res: Response) => {
         const newToken = jwt.sign(payload, secret);
 
         res.cookie('token', newToken, { httpOnly: true });
-        return res.json({ msg: 'Login successful'});
+        return res.json({ msg: 'Login successful' , name:  user.dataValues.name});
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ msg: 'Server error' });
     }
 });
 
-router.post('/product', checkJwt, (req: Request, res: Response) => {
-    // Your protected route logic here
+router.get('/product', checkJwt, (req: Request, res: Response) => {
     res.status(200).json({ content: 'some content' });
 });
 
-router.post('/users',checkJwt ,async (req: Request, res: Response) => {
+router.get('/users',checkJwt ,async (req: Request, res: Response) => {
     try {
         const users = await Users.findAll();
         res.json(users);
@@ -64,7 +63,7 @@ function checkJwt(req: Request, res: Response, next: Function) {
                 next();
                 break;
             default:
-                res.status(401).json({ msg: `your name ${decodedToken.name}` });
+                res.status(401).json({ msg: `not authorized user` });
                 break;
         }
     });
