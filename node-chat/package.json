@@ -3,25 +3,29 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": " node server.js"
+    "start": "nodemon --watch src --ext ts,json --exec \"ts-node\" ./src/app.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.41",
+    "@sequelize/mysql": "^7.0.0-alpha.41",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.1",
-    "socket.io": "^4.7.5",
-    "tsc": "^2.0.4"
+    "sequelize": "^6.37.3",
+    "sequelize-typescript": "^2.1.6",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.8",
+    "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
   }
