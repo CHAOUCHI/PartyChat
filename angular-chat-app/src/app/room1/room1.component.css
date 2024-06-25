@@ -1,0 +1,117 @@
+body {
+    margin: 0;
+    padding-bottom: 3rem;
+    font-family: Arial;
+}
+
+#form {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.25rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 3rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+}
+
+#input {
+    border: none;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0.25rem;
+}
+
+#input:focus {
+    outline: none;
+}
+
+#form>button {
+    background: #333;
+    border: none;
+    padding: 0 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: #fff;
+}
+
+
+
+/* #messages>li:nth-child(odd) {
+    /* background: #efefef; 
+} */
+
+#inputChatContainer {
+    position: fixed;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#inputChat {
+    position: relative;
+}
+
+#usersContainer {
+    position: absolute;
+    bottom: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+#user{
+    margin-left: 1%;
+}
+
+#user:hover{
+    cursor: pointer;
+}
+
+#messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adjust as needed for spacing between messages */
+    padding: 20px; /* Example padding for the messages container */
+}
+
+.message-container {
+    max-width: 70%; /* Limit the maximum width of the message container */
+    padding: 8px; /* Adjust padding for smaller message containers */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word; /* Ensures long words break to fit within container */
+}
+
+.right {
+    align-self: flex-end; /* Aligns the container to the right within #messages */
+    text-align: right; /* Align text to the right within the container */
+}
+
+.pinged {
+    background-color: rgb(95, 82, 209);
+    color: white;
+}
+
+.left {
+    align-self: flex-start; /* Aligns the container to the left within #messages */
+    text-align: left; /* Align text to the left within the container */
+}
+
+.h4Messages{
+    margin-block-start: 0.2em;
+    
+}
+
+.message {
+    margin-block-end: 0;
+}
+
