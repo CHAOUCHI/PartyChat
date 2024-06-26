@@ -52,4 +52,12 @@ export class SocketIoService {
   disconnect(): void {
     this.socket.disconnect();
   }
+
+  onWebcam(callback: (data: Blob) => void) {
+    this.socket.on('videoStream', callback);
+  }
+
+  sendVideoStream(data: Blob) {
+    this.socket.emit('videoStream', data);
+  }
 }

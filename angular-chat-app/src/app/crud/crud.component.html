@@ -1,5 +1,9 @@
+@if (crud.connected) {
+<p>connected</p>
+} @else {
 <form [formGroup]="loginForm" (ngSubmit)="submitLog($event)">
     <input type="text" name="email" id="email" formControlName="email">
     <input type="password" name="password" id="password" formControlName="password">
     <button type="submit" [disabled]="!loginForm.valid">try</button>
 </form>
+}
