@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CrudService } from '../crud.service';
+import { AuthService } from '../authService.service';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule,  } from '@angular/forms';
 
 
@@ -12,7 +12,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule,  } from '@angu
 })
 export class CrudComponent {
 
-  constructor(public crud: CrudService) {}
+  constructor(public AuthService: AuthService) {}
 
   loginForm = new FormGroup({
     email: new FormControl<string>("", [
@@ -27,6 +27,6 @@ export class CrudComponent {
     event.preventDefault();
     const email = this.loginForm.get('email')?.value!;
     const password = this.loginForm.get('password')?.value!;
-    await this.crud.login(email,password); 
+    await this.AuthService.login(email,password); 
   }
 }

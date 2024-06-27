@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CrudService } from '../crud.service';
+import { AuthService } from '../authService.service';
 
 @Component({
   selector: 'app-home',
@@ -10,5 +10,5 @@ import { CrudService } from '../crud.service';
 })
 export class HomeComponent {
 
-  constructor( private crud: CrudService) {}
+  constructor( private AuthService: AuthService) {}
 }

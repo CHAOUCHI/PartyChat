@@ -33,7 +33,11 @@ router.post('/login', async (req: Request, res: Response) => {
         return res.json({ msg: 'Login successful' , name:  user.dataValues.name});
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).json({ msg: 'Server error' });
+        // const body : ApiBody = {
+        //     msg : 'Server error',
+        //     data : null
+        // }
+        // res.status(500).json(body);
     }
 });
 

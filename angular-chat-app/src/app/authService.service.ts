@@ -3,11 +3,13 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class CrudService {
-  public userName: string = "";
+export class AuthService {
+  // public userName: string = "";
   public connected: boolean = false;
 
-  constructor() { }
+  constructor() {
+    this.connected = this.isLogin();
+  }
 
   async login(email: string, password: string) {
     const url = 'http://localhost:3000/login';
@@ -21,10 +23,12 @@ export class CrudService {
 
     try {
       const response = await fetch(url, options);
-      const result = await response.json();
+      const connectedUser = await response.json();
 
-      if (result.name) {
-        this.userName = result.name;
+      if (response.ok) {
+        // this.userName = connectedUser.name;
+        localStorage.setItem('connected', 'true');
+        localStorage.setItem('user', connectedUser.name);
         this.connected = true;
         // console.log(this.userName);
       } else {
@@ -32,6 +36,16 @@ export class CrudService {
       }
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  isLogin(): boolean {
+    const connected = localStorage.getItem('connected');
+
+    if (connected === 'true') {
+      return true;
+    } else {
+      return false;
     }
   }
 }

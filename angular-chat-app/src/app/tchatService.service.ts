@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 @Injectable({
   providedIn: 'root'
 })
-export class SocketIoService {
+export class TchatService {
   private readonly URL: string = 'http://localhost:3000';
   private socket: Socket = io(this.URL);
   public socketId: string = '';

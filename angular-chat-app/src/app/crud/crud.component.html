@@ -1,4 +1,4 @@
-@if (crud.connected) {
+@if (AuthService.connected) {
 <p>connected</p>
 } @else {
 <form [formGroup]="loginForm" (ngSubmit)="submitLog($event)">

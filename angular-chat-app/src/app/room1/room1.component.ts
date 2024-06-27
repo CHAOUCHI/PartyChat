@@ -1,9 +1,9 @@
 import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild, OnChanges } from '@angular/core';
-import { SocketIoService } from '../socket.io.service';
+import { TchatService } from '../tchatService.service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { isInArray } from '../../validators/isInArray';
 import { NgClass, NgStyle } from '@angular/common';
-import { CrudService } from '../crud.service';
+import { AuthService } from '../authService.service';
 
 @Component({
   selector: 'app-room1',
@@ -23,31 +23,26 @@ export class Room1Component implements OnInit, OnChanges {
   connectedUsersName: string[] = [];
   showUsers: boolean = false;
 
-  nameInput = new FormControl<string>("", [
-    Validators.required,
-    Validators.pattern(/^[^\s]+$/)
-  ]);
-
   messageInput = new FormControl<string>("", [
     Validators.required,
     Validators.maxLength(255)
   ]);
 
-  constructor(private socketIoService: SocketIoService, private crud: CrudService) {}
+  constructor(private tchatService: TchatService, private AuthService: AuthService) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['room'] && !changes['room'].firstChange) {
-      this.socketIoService.disconnect();
-      this.socketIoService = new SocketIoService(); // Create a new instance of the service
+      this.tchatService.disconnect();
+      this.tchatService = new TchatService(); // Create a new instance of the service
       this.socketChanges();
 
-      this.socketIoService.joinRoom(changes['room'].currentValue, (response) => {
+      this.tchatService.joinRoom(changes['room'].currentValue, (response) => {
         console.log(`Joined room: ${this.room}`);
       });
       this.name = '';
-      if (this.crud.userName !== '') {
-      this.name = this.crud.userName
-      this.socketIoService.setName(this.name, (response) => {
+      if (this.AuthService.isLogin()) {
+      this.name = localStorage.getItem('user')!;
+      this.tchatService.setName(this.name, (response) => {
         console.log(`Name set to: ${this.name}`);
       });
     }
@@ -56,9 +51,9 @@ export class Room1Component implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    if (this.crud.userName !== '') {
-      this.name = this.crud.userName
-      this.socketIoService.setName(this.name, (response) => {
+    if (this.AuthService.isLogin()) {
+      this.name = localStorage.getItem('user')!;
+      this.tchatService.setName(this.name, (response) => {
         console.log(`Name set to: ${this.name}`);
       });
     }
@@ -66,7 +61,7 @@ export class Room1Component implements OnInit, OnChanges {
     this.socketChanges();
 
     if (this.room) {
-      this.socketIoService.joinRoom(this.room, (response) => {
+      this.tchatService.joinRoom(this.room, (response) => {
         console.log(`Joined room: ${this.room}`);
       });
     }
@@ -83,44 +78,33 @@ export class Room1Component implements OnInit, OnChanges {
   }
 
   socketChanges() {
-    this.socketIoService.onMessage((message: { name: string, msg: string, idSender: string, IDs: string[] }) => {
-      const sentByUser = message.idSender === this.socketIoService.socketId;
-      const pingedUser = message.IDs.includes(this.socketIoService.socketId);
+    this.tchatService.onMessage((message: { name: string, msg: string, idSender: string, IDs: string[] }) => {
+      const sentByUser = message.idSender === this.tchatService.socketId;
+      const pingedUser = message.IDs.includes(this.tchatService.socketId);
       this.messages.push({ ...message, sentByUser, pingedUser });
       if (pingedUser) {
         this.showNotification(message.name, message.msg);
       }
     });
 
-    this.socketIoService.onConnectedSockets((sockets: { id: string, name: string }[]) => {
+    this.tchatService.onConnectedSockets((sockets: { id: string, name: string }[]) => {
       this.connectedUsers = sockets;
       this.connectedUsersName = this.connectedUsers.map(user => user.name);
-      this.updateValidator();
     });
 
-    this.socketIoService.onUserDisconnected((userId: string) => {
+    this.tchatService.onUserDisconnected((userId: string) => {
       // console.log(userId)
       this.connectedUsers = this.connectedUsers.filter(user => user.id !== userId);
       this.connectedUsersName = this.connectedUsers.map(user => user.name);
       console.log(this.connectedUsersName)
-      this.updateValidator();
     });
-  }
-
-  updateValidator() {
-    this.nameInput.setValidators([
-      Validators.required,
-      Validators.pattern(/^[^\s]+$/),
-      isInArray(this.connectedUsersName)
-    ]);
-    this.nameInput.updateValueAndValidity();
   }
 
   // setName(event: Event): void {
   //   event.preventDefault();
     
   //   this.name = this.nameInput.value!;
-  //   this.socketIoService.setName(this.name, (response) => {
+  //   this.TchatService.setName(this.name, (response) => {
   //     console.log(`Name set to: ${this.name}`);
   //   });
 
@@ -132,7 +116,7 @@ export class Room1Component implements OnInit, OnChanges {
     this.message = this.messageInput.value!;
     const mentionedUserIds = this.getMentionedUserIds(this.message);
 
-    this.socketIoService.sendMessage(this.room, this.message, this.socketIoService.socketId, mentionedUserIds);
+    this.tchatService.sendMessage(this.room, this.message, this.tchatService.socketId, mentionedUserIds);
     this.messageInput.reset();
     this.showUsers = false;
   }
