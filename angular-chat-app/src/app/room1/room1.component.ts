@@ -33,13 +33,12 @@ export class Room1Component implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['room'] && !changes['room'].firstChange) {
       this.tchatService.disconnect();
-      this.tchatService = new TchatService(); // Create a new instance of the service
+      this.tchatService.connection();
       this.socketChanges();
 
       this.tchatService.joinRoom(changes['room'].currentValue, (response) => {
         console.log(`Joined room: ${this.room}`);
       });
-      this.name = '';
       if (this.AuthService.isLogin()) {
       this.name = localStorage.getItem('user')!;
       this.tchatService.setName(this.name, (response) => {
@@ -51,6 +50,9 @@ export class Room1Component implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.tchatService.disconnect();
+    this.tchatService.connection();
+
     if (this.AuthService.isLogin()) {
       this.name = localStorage.getItem('user')!;
       this.tchatService.setName(this.name, (response) => {

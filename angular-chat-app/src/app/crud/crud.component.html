@@ -1,4 +1,4 @@
-@if (AuthService.connected) {
+@if (AuthService.isLogin()) {
 <p>connected</p>
 } @else {
 <form [formGroup]="loginForm" (ngSubmit)="submitLog($event)">

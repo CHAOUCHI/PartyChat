@@ -5,11 +5,6 @@ import { Injectable } from '@angular/core';
 })
 export class AuthService {
   // public userName: string = "";
-  public connected: boolean = false;
-
-  constructor() {
-    this.connected = this.isLogin();
-  }
 
   async login(email: string, password: string) {
     const url = 'http://localhost:3000/login';
@@ -29,7 +24,6 @@ export class AuthService {
         // this.userName = connectedUser.name;
         localStorage.setItem('connected', 'true');
         localStorage.setItem('user', connectedUser.name);
-        this.connected = true;
         // console.log(this.userName);
       } else {
         console.log('Wrong password');
