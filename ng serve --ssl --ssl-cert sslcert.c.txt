@@ -1,0 +1,1 @@
+ ng serve --ssl --ssl-cert "ssl/cert.crt" --ssl-key "ssl/cert.key"

@@ -1,9 +1,9 @@
 import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild, OnChanges } from '@angular/core';
-import { TchatService } from '../tchatService.service';
+import { TchatService } from '../services/tchatService.service';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { isInArray } from '../../validators/isInArray';
 import { NgClass, NgStyle } from '@angular/common';
-import { AuthService } from '../authService.service';
+import { AuthService } from '../services/authService.service';
 
 @Component({
   selector: 'app-room1',
@@ -19,7 +19,7 @@ export class Room1Component implements OnInit, OnChanges {
   message: string = '';
   @Input() room: string = '';
   name: string = '';
-  connectedUsers: { id: string, name: string }[] = [];
+  connectedUsers: { id: string, name: string}[] = [];
   connectedUsersName: string[] = [];
   showUsers: boolean = false;
 
@@ -36,9 +36,11 @@ export class Room1Component implements OnInit, OnChanges {
       this.tchatService.connection();
       this.socketChanges();
 
-      this.tchatService.joinRoom(changes['room'].currentValue, (response) => {
-        console.log(`Joined room: ${this.room}`);
-      });
+      this.tchatService.joinRoom(changes['room'].currentValue).then((succes)=>{
+        console.log('Joined room')
+      }).catch((failed)=>{
+        console.log('Error joining room')
+      })
       if (this.AuthService.isLogin()) {
       this.name = localStorage.getItem('user')!;
       this.tchatService.setName(this.name, (response) => {
@@ -63,9 +65,11 @@ export class Room1Component implements OnInit, OnChanges {
     this.socketChanges();
 
     if (this.room) {
-      this.tchatService.joinRoom(this.room, (response) => {
-        console.log(`Joined room: ${this.room}`);
-      });
+      this.tchatService.joinRoom(this.room).then((succes)=>{
+        console.log('Joined room')
+      }).catch((failed)=>{
+        console.log('Error joining room')
+      })
     }
 
     if ('Notification' in window) {

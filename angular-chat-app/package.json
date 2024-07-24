@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve-ssl":"ng serve --ssl --ssl-cert \"ssl/cert.crt\" --ssl-key \"ssl/cert.key\" --host 192.168.10.113"
   },
   "private": true,
   "dependencies": {

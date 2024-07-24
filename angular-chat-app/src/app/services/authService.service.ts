@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Payload } from '../interfaces/Payload';
+import { connect } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +9,7 @@ export class AuthService {
   // public userName: string = "";
 
   async login(email: string, password: string) {
-    const url = 'http://localhost:3000/login';
+    const url = 'https://192.168.10.113:3000/login';
     const headers = new Headers({ "Content-Type": "application/json" });
     const options: RequestInit = {
       method: "POST",
@@ -40,6 +42,16 @@ export class AuthService {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public payload() : Payload{
+    // base64 (ascii) --> JSON(binary) : jsonToken = atob(token)
+    // JSON --> ObjectTS : payload : Payload JSON.parse(jsonToken)
+
+    return {
+      name : "Massi",
+      role : "admin"
     }
   }
 }

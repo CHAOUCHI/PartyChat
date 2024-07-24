@@ -1,0 +1,14 @@
+<div>
+  <h2>Local Video</h2>
+  <video #localVideo autoplay playsinline controls></video>
+  <h2>Remote Video</h2>
+  <video #remoteVideo autoplay playsinline controls></video>
+</div>
+<button (click)="call()">Call</button>
+  @if (inCall !== true) {
+    @for (offer of webRTCService.offers; track offer.sdp) {
+      <button (click)="answerOffer(offer)">An offer</button>
+    }
+  } @else { 
+    <button (click)="leave()">Leave</button>
+  }
