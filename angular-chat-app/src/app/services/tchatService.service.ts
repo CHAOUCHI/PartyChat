@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
   providedIn: 'root'
 })
 export class TchatService {
-  private readonly URL: string = 'https://192.168.10.113:3000';
+  private readonly URL: string = 'https://192.168.1.180:3000';
   private socket: Socket | null = null;
   public socketId: string = '';
   private peerConnection: RTCPeerConnection | null = null;

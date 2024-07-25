@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, response, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import sequelize from '../db/databaseQuery'
 import { Users } from '../db/databaseQuery';
@@ -7,6 +7,10 @@ import { Payload } from '../interface/Payload';
 
 const router = express.Router();
 const secret = 'secret-for-jwt';
+
+router.get('/', (req : Request, res: Response)=> {
+    return res.json({msg : "server working"})
+})
 
 router.post('/login', async (req: Request, res: Response) => {
 

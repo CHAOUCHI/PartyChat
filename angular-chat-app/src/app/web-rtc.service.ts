@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { TchatService } from './services/tchatService.service';
+import { BehaviorSubject } from 'rxjs'; 
 import { Offer } from './interfaces/Offer';
 
 @Injectable({
@@ -12,13 +13,21 @@ export class WebRTCService {
   private localStream: MediaStream | undefined; // Flux vidéo/audio local
   private remoteStream: MediaStream | undefined; // Flux vidéo/audio distant
   public offers: RTCSessionDescriptionInit[] = [];
+  private audioContext: AudioContext | undefined;
+  private analyser: AnalyserNode | undefined;
+  private dataArray: Uint8Array | undefined;
+  public audioStrength: number = 0;
+  private animationFrameId: number | undefined;
+  private dataChannel: RTCDataChannel | undefined;
+
+  private audioStrengthSubject = new BehaviorSubject<number>(0); 
+
+  public audioStrength$ = this.audioStrengthSubject.asObservable();
 
   constructor(private socketService: TchatService) {
     // Initialisation de la connexion Socket.IO
-    this.socket = io('https://192.168.10.113:3000');
-
-    // Configuration des serveurs STUN pour WebRTC
-    this.createPeerConnection()
+    this.socket = io('https://192.168.1.180:3000');
+    this.createPeerConnection();
   }
 
   createPeerConnection() {
@@ -27,6 +36,13 @@ export class WebRTCService {
         { urls: 'stun:stun.l.google.com:19302' }
       ]
     });
+
+    this.peerConnection.ondatachannel = (event) => {
+      const receivedDataChannel = event.channel;
+      this.setupDataChannel(receivedDataChannel);
+    };
+
+    this.createDataChannel();
 
     // Gestion des candidats ICE
     this.peerConnection.onicecandidate = (event) => {
@@ -42,13 +58,12 @@ export class WebRTCService {
 
     // Réception d'une offre WebRTC
     this.socket.on('offer', async (offer) => {
-      this.offers.push(offer)
+      this.offers.push(offer);
       // await this.answerOffer(offer); // Uncomment this line if you want to handle the offer immediately
     });
 
     // Réception d'une réponse WebRTC
     this.socket.on('answer', async (answer) => {
-
       await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
     });
 
@@ -58,28 +73,76 @@ export class WebRTCService {
     });
   }
 
+  private createDataChannel() {
+    if (this.peerConnection) {
+      this.dataChannel = this.peerConnection.createDataChannel('audioDataChannel');
+      this.setupDataChannel(this.dataChannel);
+    }
+  }
+
+  private setupDataChannel(dataChannel: RTCDataChannel | undefined) {
+    if (dataChannel) {
+      dataChannel.onopen = () => {
+        console.log('Data channel is open');
+      };
+
+      dataChannel.onmessage = (event) => {
+        console.log('Received message:', event.data);
+        const data = JSON.parse(event.data);
+        console.log('Received audio strength data:', data.audioStrength);
+        this.audioStrengthSubject.next(data.audioStrength);
+      };
+    }
+  }
+
   // Démarre le flux vidéo/audio local
   async startLocalStream(): Promise<MediaStream> {
-    this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     this.localStream.getTracks().forEach(track => {
       this.peerConnection?.addTrack(track, this.localStream!); // Ajout des pistes à la connexion WebRTC
     });
+
+    if (this.localStream) {
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.analyser = this.audioContext.createAnalyser();
+      const audioSource = this.audioContext.createMediaStreamSource(this.localStream);
+      audioSource.connect(this.analyser);
+      
+      this.analyser.fftSize = 2048;
+      const bufferLength = this.analyser.frequencyBinCount;
+      this.dataArray = new Uint8Array(bufferLength);
+
+      this.updateAudioStrength();
+    }
+
     return this.localStream;
   }
 
-  // Crée et envoie une offre WebRTC
+  private updateAudioStrength(): void {
+    if (!this.analyser || !this.dataArray) return;
+
+    this.analyser.getByteFrequencyData(this.dataArray);
+
+    const sum = this.dataArray.reduce((a, b) => a + b, 0);
+    this.audioStrength = sum / this.dataArray.length;
+
+    if (this.dataChannel?.readyState === 'open') {
+      this.dataChannel.send(JSON.stringify({ audioStrength: this.audioStrength }));
+    }
+
+    this.animationFrameId = requestAnimationFrame(() => this.updateAudioStrength());
+  }
+
   async createOffer(): Promise<void> {
     const offer = await this.peerConnection?.createOffer();
     await this.peerConnection?.setLocalDescription(offer);
     this.socket.emit('offer', offer); // Envoi de l'offre au serveur
   }
 
-  // Retourne la connexion WebRTC
   getPeerConnection(): RTCPeerConnection {
     return this.peerConnection!;
   }
 
-  // Répond à une offre WebRTC
   async answerOffer(offer: RTCSessionDescriptionInit): Promise<void> {
     try {
       await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(offer));
@@ -92,6 +155,12 @@ export class WebRTCService {
   }
 
   closeConnection() {
-    this.peerConnection?.close()
+    this.peerConnection?.close();
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
   }
 }

@@ -9,7 +9,7 @@ export class AuthService {
   // public userName: string = "";
 
   async login(email: string, password: string) {
-    const url = 'https://192.168.10.113:3000/login';
+    const url = 'https://192.168.1.180:3000/login';
     const headers = new Headers({ "Content-Type": "application/json" });
     const options: RequestInit = {
       method: "POST",
