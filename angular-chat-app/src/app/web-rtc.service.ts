@@ -8,7 +8,7 @@ import { Offer } from './interfaces/Offer';
   providedIn: 'root'
 })
 export class WebRTCService {
-  private socket: Socket; // Socket pour la communication en temps réel
+  // private socket: Socket; // Socket pour la communication en temps réel
   private peerConnection: RTCPeerConnection | null = null; // Connexion WebRTC
   private localStream: MediaStream | undefined; // Flux vidéo/audio local
   private remoteStream: MediaStream | undefined; // Flux vidéo/audio distant
@@ -26,7 +26,8 @@ export class WebRTCService {
 
   constructor(private socketService: TchatService) {
     // Initialisation de la connexion Socket.IO
-    this.socket = io('https://192.168.1.180:3000');
+    this.socketService.disconnect();
+    this.socketService.connection();
     this.createPeerConnection();
   }
 
@@ -47,7 +48,8 @@ export class WebRTCService {
     // Gestion des candidats ICE
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.socket.emit('candidate', event.candidate); // Envoi des candidats ICE au serveur
+        this.socketService.emitCandidate(event.candidate);
+        // this.socket.emit('candidate', event.candidate); // Envoi des candidats ICE au serveur
       }
     };
 
@@ -57,20 +59,33 @@ export class WebRTCService {
     };
 
     // Réception d'une offre WebRTC
-    this.socket.on('offer', async (offer) => {
+    this.socketService.onOffer((offer)=> {
       this.offers.push(offer);
-      // await this.answerOffer(offer); // Uncomment this line if you want to handle the offer immediately
-    });
+    }) 
+
+    
+    // this.socket.on('offer', async (offer) => {
+    //   this.offers.push(offer);
+    //   // await this.answerOffer(offer); // Uncomment this line if you want to handle the offer immediately
+    // });
 
     // Réception d'une réponse WebRTC
-    this.socket.on('answer', async (answer) => {
-      await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
-    });
+
+    this.socketService.onAnswer(async (answer)=>{
+      await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer))
+    })
+    // this.socket.on('answer', async (answer) => {
+    //   await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(answer));
+    // });
 
     // Réception d'un candidat ICE
-    this.socket.on('candidate', async (candidate) => {
+    this.socketService.onCandidate(async (candidate) => {
       await this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
-    });
+    })
+
+    // this.socket.on('candidate', async (candidate) => {
+    //   await this.peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
+    // });
   }
 
   private createDataChannel() {
@@ -136,7 +151,8 @@ export class WebRTCService {
   async createOffer(): Promise<void> {
     const offer = await this.peerConnection?.createOffer();
     await this.peerConnection?.setLocalDescription(offer);
-    this.socket.emit('offer', offer); // Envoi de l'offre au serveur
+    this.socketService.emitOffer(offer!)
+    // this.socket.emit('offer', offer); // Envoi de l'offre au serveur
   }
 
   getPeerConnection(): RTCPeerConnection {
@@ -148,7 +164,8 @@ export class WebRTCService {
       await this.peerConnection?.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await this.peerConnection?.createAnswer();
       await this.peerConnection?.setLocalDescription(answer);
-      this.socket.emit('answer', answer); // Envoi de la réponse au serveur
+      this.socketService.emitAnswer(answer);
+      // this.socket.emit('answer', answer); // Envoi de la réponse au serveur
     } catch (error) {
       console.error('Error answering offer:', error);
     }

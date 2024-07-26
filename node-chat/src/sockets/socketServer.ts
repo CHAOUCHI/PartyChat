@@ -17,7 +17,6 @@ export default function socketServer(io: Server) {
       connectedSockets[socket.id] = { id: socket.id, name: name };
       console.log(`Socket with ID ${socket.id} is named ${socket.data.name}`);
       io.emit('connectedUsers', Object.values(connectedSockets));
-      console.log(connectedSockets);
     });
 
     socket.on('join room', (room, callback) => {

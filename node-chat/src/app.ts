@@ -48,7 +48,7 @@ socketServer(io);
 
 // Start server
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-const HOST = "192.168.1.180";
+const HOST = "192.168.10.119";
 
 server.listen(PORT, HOST,() => {
     console.log(`Server running at https://${HOST}:${PORT}`);
