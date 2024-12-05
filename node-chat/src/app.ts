@@ -1,32 +1,44 @@
 import express from 'express';
-import http from 'http';
+import https from 'https'; // Import the 'https' module
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
+import fs from 'fs'; // Import the 'fs' module to read files
 import authRoutes from './routes/authRoutes';
 import socketServer from './sockets/socketServer';
-import sequelize from './db/databaseQuery'
-import test from 'node:test';
 
 const app = express();
-const server = http.createServer(app);
+
+// Load SSL certificate and key
+const sslOptions = {
+    key: fs.readFileSync('../node-chat/ssl/cert.key'),
+    cert: fs.readFileSync('../node-chat/ssl/cert.crt')
+};
+
+// Create HTTPS server
+const server = https.createServer(sslOptions, app);
+
+const allowedOrigin = true; // Update with your frontend's IP and port
+
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:4200',
-    },
+        origin: allowedOrigin,
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
+        credentials: true
+    }
 });
 
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: allowedOrigin,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
     credentials: true
 }));
+
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
-
-test()
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use(authRoutes);
@@ -34,12 +46,10 @@ app.use(authRoutes);
 // Socket.IO Server
 socketServer(io);
 
-
-
-
-
 // Start server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const HOST = "192.168.10.119";
+
+server.listen(PORT, HOST,() => {
+    console.log(`Server running at https://${HOST}:${PORT}`);
 });

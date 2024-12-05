@@ -1,0 +1,22 @@
+<div>
+  <div class="video-container">
+    <h2>Local Video</h2>
+    <video #localVideo class="video" [ngClass]="{'highlight': audioStrength > remoteAudioStrength, 'lowlight': audioStrength <= remoteAudioStrength}" autoplay playsinline controls muted></video>
+  </div>
+  <div class="video-container">
+    <h2>Remote Video</h2>
+    <video #remoteVideo class="video" [ngClass]="{'highlight': remoteAudioStrength > audioStrength, 'lowlight': remoteAudioStrength <= audioStrength}" autoplay playsinline controls></video>
+  </div>
+</div>
+<button (click)="call()">Call</button>
+@if (inCall !== true) {
+
+@for (offer of webRTCService.offers; track offer.sdp) {
+<button (click)="answerOffer(offer)">An offer</button>
+}
+} @else {
+<button (click)="leave()">Leave</button>
+}
+
+<p>Local Audio Strength: {{ audioStrength.toFixed(2) }}</p>
+<p>Remote Audio Strength: {{ remoteAudioStrength.toFixed(2) }}</p>
